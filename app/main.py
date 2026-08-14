@@ -1,7 +1,9 @@
-from database import get_connection
+import requests
 
-connection = get_connection()
+response = requests.get(
+    "https://api.themoviedb.org",
+    timeout=10
+)
 
-print("Database connection successful!")
-
-connection.close()
+print(response.status_code)
+print(response.text[:500])
