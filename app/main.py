@@ -1,9 +1,5 @@
-import requests
+from omdb_api import search_movie
 
-response = requests.get(
-    "https://api.themoviedb.org",
-    timeout=10
-)
-
-print(response.status_code)
-print(response.text[:500])
+print(search_movie(""))
+print(search_movie("asdkjaskjdaksjd"))
+print(search_movie("Interstellar"))
