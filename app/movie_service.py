@@ -92,3 +92,31 @@ def get_movie_by_title(title):
     connection.close()
 
     return movie
+from omdb_api import search_movie
+
+
+def add_movies_batch(titles):
+    added = []
+    failed = []
+
+    for title in titles:
+        movie_data = search_movie(title)
+
+        if not movie_data:
+            failed.append(title)
+            continue
+
+        add_movie(
+            tmdb_id=movie_data["imdb_id"],
+            title=movie_data["title"],
+            release_date=movie_data["release_date"],
+            runtime=movie_data["runtime"],
+            rating=movie_data["rating"],
+            overview=movie_data["overview"]
+        )
+        added.append(movie_data["title"])
+
+    return {
+        "added": added,
+        "failed": failed
+    }
