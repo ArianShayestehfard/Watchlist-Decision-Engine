@@ -1,4 +1,5 @@
 from database import get_connection
+from omdb_api import search_movie
 
 
 def add_movie(tmdb_id, title, release_date, runtime, rating, overview):
@@ -92,7 +93,6 @@ def get_movie_by_title(title):
     connection.close()
 
     return movie
-from omdb_api import search_movie
 
 
 def add_movies_batch(titles):
@@ -120,3 +120,42 @@ def add_movies_batch(titles):
         "added": added,
         "failed": failed
     }
+
+
+def update_movie_status(movie_id, new_status):
+    valid_statuses = ("want_to_watch", "watching", "watched")
+
+    if new_status not in valid_statuses:
+        print(f"Error: invalid status '{new_status}'. Must be one of {valid_statuses}.")
+        return
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    cursor.execute("""
+                   UPDATE movies
+                   SET status = ?
+                   WHERE id = ?
+                   """, (new_status, movie_id))
+
+    connection.commit()
+    connection.close()
+
+    print("Movie status updated successfully!")
+
+
+def get_movies_by_status(status):
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    cursor.execute("""
+                   SELECT id, tmdb_id, title, release_date, runtime, rating, status
+                   FROM movies
+                   WHERE status = ?
+                   """, (status,))
+
+    movies = cursor.fetchall()
+
+    connection.close()
+
+    return movies
