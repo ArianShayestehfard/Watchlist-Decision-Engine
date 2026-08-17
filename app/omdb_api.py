@@ -24,15 +24,39 @@ def parse_runtime(raw_runtime):
 
 
 def search_movie(title):
+    if not title or not title.strip():
+        print("Error: movie title cannot be empty.")
+        return None
+
     params = {
         "apikey": API_KEY,
         "t": title
     }
 
-    response = requests.get(BASE_URL, params=params, timeout=10)
-    data = response.json()
+    try:
+        response = requests.get(BASE_URL, params=params, timeout=10)
+        response.raise_for_status()
+    except requests.exceptions.Timeout:
+        print("Error: request to OMDb timed out.")
+        return None
+    except requests.exceptions.ConnectionError:
+        print("Error: could not connect to OMDb. Check your internet connection.")
+        return None
+    except requests.exceptions.HTTPError as e:
+        print(f"Error: OMDb returned an HTTP error ({e}).")
+        return None
+    except requests.exceptions.RequestException as e:
+        print(f"Error: unexpected request failure ({e}).")
+        return None
+
+    try:
+        data = response.json()
+    except ValueError:
+        print("Error: OMDb returned an invalid response.")
+        return None
 
     if data.get("Response") == "False":
+        print(f"Movie not found: {data.get('Error', 'unknown reason')}")
         return None
 
     return {
