@@ -2,13 +2,14 @@ from database import get_connection
 from omdb_api import search_movie
 
 
-def add_movie(tmdb_id, title, release_date, runtime, rating, overview):
+def add_movie(imdb_id, title, release_date, runtime, rating, overview):
+
     connection = get_connection()
     cursor = connection.cursor()
 
     cursor.execute("""
                    INSERT OR IGNORE INTO movies (
-            tmdb_id,
+            imdb_id,
             title,
             release_date,
             runtime,
@@ -17,7 +18,7 @@ def add_movie(tmdb_id, title, release_date, runtime, rating, overview):
         )
         VALUES (?, ?, ?, ?, ?, ?)
                    """, (
-                       tmdb_id,
+                       imdb_id,
                        title,
                        release_date,
                        runtime,
@@ -32,11 +33,18 @@ def add_movie(tmdb_id, title, release_date, runtime, rating, overview):
 
 
 def get_movies():
+
     connection = get_connection()
     cursor = connection.cursor()
 
     cursor.execute("""
-                   SELECT id, tmdb_id, title, release_date, runtime, rating
+                   SELECT
+                       id,
+                       imdb_id,
+                       title,
+                       release_date,
+                       runtime,
+                       rating
                    FROM movies
                    """)
 
@@ -48,6 +56,7 @@ def get_movies():
 
 
 def update_movie_rating(movie_id, new_rating):
+
     connection = get_connection()
     cursor = connection.cursor()
 
@@ -64,6 +73,7 @@ def update_movie_rating(movie_id, new_rating):
 
 
 def delete_movie(movie_id):
+
     connection = get_connection()
     cursor = connection.cursor()
 
@@ -79,11 +89,18 @@ def delete_movie(movie_id):
 
 
 def get_movie_by_title(title):
+
     connection = get_connection()
     cursor = connection.cursor()
 
     cursor.execute("""
-                   SELECT id, tmdb_id, title, release_date, runtime, rating
+                   SELECT
+                       id,
+                       imdb_id,
+                       title,
+                       release_date,
+                       runtime,
+                       rating
                    FROM movies
                    WHERE title = ?
                    """, (title,))
@@ -96,10 +113,12 @@ def get_movie_by_title(title):
 
 
 def add_movies_batch(titles):
+
     added = []
     failed = []
 
     for title in titles:
+
         movie_data = search_movie(title)
 
         if not movie_data:
@@ -107,13 +126,14 @@ def add_movies_batch(titles):
             continue
 
         add_movie(
-            tmdb_id=movie_data["imdb_id"],
+            imdb_id=movie_data["imdb_id"],
             title=movie_data["title"],
             release_date=movie_data["release_date"],
             runtime=movie_data["runtime"],
             rating=movie_data["rating"],
             overview=movie_data["overview"]
         )
+
         added.append(movie_data["title"])
 
     return {
@@ -123,20 +143,50 @@ def add_movies_batch(titles):
 
 
 def update_movie_status(movie_id, new_status):
-    valid_statuses = ("want_to_watch", "watching", "watched")
+
+    valid_statuses = (
+        "planned",
+        "watching",
+        "watched"
+    )
 
     if new_status not in valid_statuses:
-        print(f"Error: invalid status '{new_status}'. Must be one of {valid_statuses}.")
+
+        print(
+            f"Error: invalid status '{new_status}'. "
+            f"Must be one of {valid_statuses}."
+        )
+
         return
 
     connection = get_connection()
     cursor = connection.cursor()
 
+    # اول بررسی کنیم فیلم وجود دارد
     cursor.execute("""
-                   UPDATE movies
-                   SET status = ?
-                   WHERE id = ?
-                   """, (new_status, movie_id))
+                   SELECT id
+                   FROM watchlist
+                   WHERE movie_id = ?
+                   """, (movie_id,))
+
+    existing = cursor.fetchone()
+
+    if existing:
+
+        # فیلم از قبل در Watchlist است
+        cursor.execute("""
+                       UPDATE watchlist
+                       SET status = ?
+                       WHERE movie_id = ?
+                       """, (new_status, movie_id))
+
+    else:
+
+        # فیلم هنوز وارد Watchlist نشده
+        cursor.execute("""
+                       INSERT INTO watchlist (movie_id, status)
+                       VALUES (?, ?)
+                       """, (movie_id, new_status))
 
     connection.commit()
     connection.close()
@@ -145,13 +195,26 @@ def update_movie_status(movie_id, new_status):
 
 
 def get_movies_by_status(status):
+
     connection = get_connection()
     cursor = connection.cursor()
 
     cursor.execute("""
-                   SELECT id, tmdb_id, title, release_date, runtime, rating, status
+                   SELECT
+                       movies.id,
+                       movies.imdb_id,
+                       movies.title,
+                       movies.release_date,
+                       movies.runtime,
+                       movies.rating,
+                       watchlist.status
+
                    FROM movies
-                   WHERE status = ?
+
+                            JOIN watchlist
+                                 ON movies.id = watchlist.movie_id
+
+                   WHERE watchlist.status = ?
                    """, (status,))
 
     movies = cursor.fetchall()
