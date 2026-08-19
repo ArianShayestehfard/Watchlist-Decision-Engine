@@ -217,6 +217,6 @@ def import_500_movies(delay=0.5):
 
         time.sleep(delay)
 
-    print(f"\n🎉 Import complete!")
+    print(f"\nImport complete")
     print(f"Added: {added}")
     print(f"Failed: {failed}")
