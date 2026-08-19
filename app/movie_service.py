@@ -88,7 +88,12 @@ def get_movies():
 def update_movie_rating(movie_id, new_rating):
     connection = get_connection()
     cursor = connection.cursor()
-    cursor.execute("UPDATE movies SET rating = ? WHERE id = ?", (new_rating, movie_id))
+    cursor.execute("SELECT id FROM ratings WHERE movie_id = ?", (movie_id,))
+    existing = cursor.fetchone()
+    if existing:
+        cursor.execute("UPDATE ratings SET user_rating = ? WHERE movie_id = ?", (new_rating, movie_id))
+    else:
+        cursor.execute("INSERT INTO ratings (movie_id, user_rating) VALUES (?, ?)", (movie_id, new_rating))
     connection.commit()
     connection.close()
     print("Movie rating updated successfully!")
