@@ -13,3 +13,12 @@ def search_movie_handler():
     if result:
         print(result)
 
+def view_watchlist_handler():
+    status = get_valid_status("Enter status (want_to_watch, watching, watched): ")
+    movies = get_movies_by_status(status)
+    if not movies:
+        print(f"No movies with status '{status}'.")
+        return
+    for movie in movies:
+        print(f"Title: {movie[2]}, Rating: {movie[5]}, Status: {movie[6]}")
+
