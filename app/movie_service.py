@@ -190,33 +190,20 @@ def get_movie_by_exact_title(title):
 def import_500_movies(delay=0.5):
     added = 0
     failed = 0
-
     for i, title in enumerate(POPULAR_MOVIES, 1):
         print(f"[{i}/{len(POPULAR_MOVIES)}] Processing: {title}")
         data = search_movie(title)
-
         if data:
-            add_movie(
-                imdb_id=data.get("imdb_id"),
-                title=data.get("title"),
-                release_date=data.get("release_date"),
-                runtime=data.get("runtime"),
-                rating=data.get("rating"),
-                overview=data.get("overview")
-            )
-
-            movie = get_movie_by_title(data.get("title"))
+            add_movie(data["imdb_id"], data["title"], data["release_date"], data["runtime"], data["rating"], data["overview"])
+            movie = get_movie_by_title(data["title"])
             if movie:
                 update_movie_status(movie[0], "want_to_watch")
-
             added += 1
             print(f"Added: {data.get('title')}")
         else:
             failed += 1
             print(f"Failed: {title}")
-
         time.sleep(delay)
-
     print(f"\nImport complete")
     print(f"Added: {added}")
     print(f"Failed: {failed}")
