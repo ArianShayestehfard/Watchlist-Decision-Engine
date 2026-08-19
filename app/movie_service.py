@@ -12,55 +12,6 @@ def get_connection():
     connection.execute("PRAGMA foreign_keys = ON")
     return connection
 
-def create_tables():
-    connection = get_connection()
-    cursor = connection.cursor()
-    cursor.execute("""
-                   CREATE TABLE IF NOT EXISTS movies (
-                                                         id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                                         imdb_id TEXT UNIQUE,
-                                                         title TEXT NOT NULL,
-                                                         release_date TEXT,
-                                                         runtime INTEGER,
-                                                         rating REAL,
-                                                         overview TEXT
-                   )
-                   """)
-    cursor.execute("""
-                   CREATE TABLE IF NOT EXISTS genres (
-                                                         id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                                         name TEXT NOT NULL UNIQUE
-                   )
-                   """)
-    cursor.execute("""
-                   CREATE TABLE IF NOT EXISTS movie_genres (
-                                                               movie_id INTEGER,
-                                                               genre_id INTEGER,
-                                                               PRIMARY KEY (movie_id, genre_id),
-                       FOREIGN KEY (movie_id) REFERENCES movies(id) ON DELETE CASCADE,
-                       FOREIGN KEY (genre_id) REFERENCES genres(id) ON DELETE CASCADE
-                       )
-                   """)
-    cursor.execute("""
-                   CREATE TABLE IF NOT EXISTS ratings (
-                                                          id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                                          movie_id INTEGER,
-                                                          user_rating REAL,
-                                                          FOREIGN KEY (movie_id) REFERENCES movies(id) ON DELETE CASCADE
-                       )
-                   """)
-    cursor.execute("""
-                   CREATE TABLE IF NOT EXISTS watchlist (
-                                                            id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                                            movie_id INTEGER UNIQUE,
-                                                            status TEXT DEFAULT 'want_to_watch',
-                                                            FOREIGN KEY (movie_id) REFERENCES movies(id) ON DELETE CASCADE
-                       )
-                   """)
-    connection.commit()
-    connection.close()
-    print("Tables created successfully!")
-
 def add_movie(imdb_id, title, release_date, runtime, rating, overview):
     connection = get_connection()
     cursor = connection.cursor()
