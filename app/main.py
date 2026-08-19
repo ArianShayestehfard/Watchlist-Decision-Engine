@@ -1,8 +1,8 @@
-from recommendation import recommend_movie, recommend_top_n
+from database import get_connection
 
-best = recommend_movie()
-print(f"Recommended: {best}")
-
-print("--- Top 3 recommendations ---")
-for movie in recommend_top_n(3):
-    print(movie)
+connection = get_connection()
+cursor = connection.cursor()
+cursor.execute("SELECT id, title, status FROM movies")
+for row in cursor.fetchall():
+    print(row)
+connection.close()
