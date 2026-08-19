@@ -73,7 +73,7 @@ def create_tables():
                    CREATE TABLE IF NOT EXISTS watchlist (
                                                             id INTEGER PRIMARY KEY AUTOINCREMENT,
                                                             movie_id INTEGER UNIQUE,
-                                                            status TEXT DEFAULT 'planned',
+                                                            status TEXT DEFAULT 'want_to_watch',
 
                                                             FOREIGN KEY (movie_id)
                        REFERENCES movies(id)
