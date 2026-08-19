@@ -69,4 +69,14 @@ def recommend_movie_handler():
     else:
         print("No rated movies in your watchlist.")
 
+def view_statistics_handler():
+    stats = watched_stats()
+    print(f"Watched movies: {stats['count']}, Average rating: {stats['average_rating']}")
+    top = top_rated(limit=5)
+    if top:
+        print("Top rated movies:")
+        for movie in top:
+            print(f"  {movie[2]} - {movie[5]}")
+    else:
+        print("No rated movies available.")
 
