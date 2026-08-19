@@ -18,3 +18,28 @@ def get_valid_rating(prompt):
         except ValueError:
             print("Invalid input. Enter a number.")
 
+def select_movie_by_title(prompt):
+    title = input(prompt).strip()
+    if not title:
+        print("Title cannot be empty.")
+        return None
+    exact = get_movie_by_exact_title(title)
+    if exact:
+        return exact
+    results = find_movies_by_title(title)
+    if not results:
+        print(f"No movie found with title containing '{title}'.")
+        return None
+    if len(results) == 1:
+        return results[0]
+    print(f"Multiple movies found with '{title}':")
+    for idx, movie in enumerate(results, 1):
+        print(f"{idx}. {movie[1]} (IMDb: {movie[2]})")
+    while True:
+        try:
+            choice = int(input("Choose a number: "))
+            if 1 <= choice <= len(results):
+                return results[choice - 1]
+            print(f"Please choose between 1 and {len(results)}.")
+        except ValueError:
+            print("Invalid input. Enter a number.")
