@@ -18,31 +18,10 @@ while True:
     try:
         choice = int(input("Choose an option : "))
 
-        if choice == 1:
-            print("Search Movie")
-
-        elif choice == 2:
-            print("View Watchlist")
-
-        elif choice == 3:
-            print("Add Movie to Watchlist")
-
-        elif choice == 4:
-            print("Change Movie Status")
-
-        elif choice == 5:
-            print("Rate Movie")
-
-        elif choice == 6:
-            print("Recommend Movie")
-
-        elif choice == 7:
-            print("View Statistics")
-
-        elif choice == 8:
-            print("Goodbye!")
-            break
-
+        if choice in menu_actions:
+            result = menu_actions[choice]()
+            if choice == 8:
+                break
         else:
             print("Please choose a number between 1 and 8.")
 
