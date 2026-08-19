@@ -184,11 +184,3 @@ def find_movies_by_title(title):
     movies = cursor.fetchall()
     connection.close()
     return movies
-
-def get_movie_by_exact_title(title):
-    connection = get_connection()
-    cursor = connection.cursor()
-    cursor.execute("SELECT id, title, imdb_id FROM movies WHERE LOWER(title) = ?", (title.lower(),))
-    movie = cursor.fetchone()
-    connection.close()
-    return movie
