@@ -8,4 +8,12 @@ def add_genre(genre_name):
     cursor.execute("INSERT OR IGNORE INTO genres (name) VALUES (?)", (genre_name,))
     conn.commit()
     conn.close()
+def get_genre_id(genre_name):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM genres WHERE name = ?", (genre_name,))
+    result = cursor.fetchone()
+    conn.close()
+    return result[0] if result else None
+
 
