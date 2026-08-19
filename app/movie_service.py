@@ -145,7 +145,7 @@ def add_movies_batch(titles):
 def update_movie_status(movie_id, new_status):
 
     valid_statuses = (
-        "planned",
+        "want_to_watch",
         "watching",
         "watched"
     )
