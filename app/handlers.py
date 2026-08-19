@@ -22,3 +22,28 @@ def view_watchlist_handler():
     for movie in movies:
         print(f"Title: {movie[2]}, Rating: {movie[5]}, Status: {movie[6]}")
 
+def add_movie_handler():
+    title = input("Enter movie title: ").strip()
+    if not title:
+        print("Title cannot be empty.")
+        return
+    existing = get_movie_by_exact_title(title)
+    if existing:
+        print(f"Movie '{existing[1]}' already exists in database.")
+        confirm = input("Do you want to add it to your watchlist? (y/n): ").lower()
+        if confirm == 'y':
+            update_movie_status(existing[0], "want_to_watch")
+            print("Movie added to watchlist with status 'want_to_watch'.")
+        else:
+            print("Operation cancelled.")
+        return
+    data = search_movie(title)
+    if not data:
+        return
+    add_movie(data["imdb_id"], data["title"], data["release_date"], data["runtime"], data["rating"], data["overview"])
+    movie = get_movie_by_title(data["title"])
+    if movie:
+        update_movie_status(movie[0], "want_to_watch")
+        print("Movie added to watchlist with status 'want_to_watch'.")
+
+
