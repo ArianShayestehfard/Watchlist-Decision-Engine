@@ -210,7 +210,7 @@ def import_500_movies(delay=0.5):
                 update_movie_status(movie[0], "want_to_watch")
 
             added += 1
-            print(f"✅ Added: {data.get('title')}")
+            print(f"Added: {data.get('title')}")
         else:
             failed += 1
             print(f"❌ Failed: {title}")
