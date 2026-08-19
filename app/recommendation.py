@@ -1,4 +1,12 @@
-from movie_service import get_movies_by_status
+from recommender import MovieRecommender
+
+_recommender = None
+
+def get_recommender():
+    global _recommender
+    if _recommender is None:
+        _recommender = MovieRecommender()
+    return _recommender
 
 def recommend_movie():
     candidates = get_movies_by_status("want_to_watch")
