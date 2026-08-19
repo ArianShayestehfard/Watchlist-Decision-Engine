@@ -1,8 +1,15 @@
-from database import get_connection
+print("""
+🎬 AI MOVIE RECOMMENDATION SYSTEM            
+                                          
+1- 🔎  Search Movie                                
+2- 📋  View Watchlist                             
+3- ➕  Add Movie to Watchlist                    
+4- 🔄  Change Movie Status                        
+5- ⭐  Rate Movie                                 
+6- 🎯  Recommend Movie                          
+7- 📊  View Statistics                           
+8- 🚪  Exit                                       
+                                                   
+Choose an option please                   
+""")
 
-connection = get_connection()
-cursor = connection.cursor()
-cursor.execute("SELECT id, title, status FROM movies")
-for row in cursor.fetchall():
-    print(row)
-connection.close()
