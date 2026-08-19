@@ -46,4 +46,12 @@ def add_movie_handler():
         update_movie_status(movie[0], "want_to_watch")
         print("Movie added to watchlist with status 'want_to_watch'.")
 
+def change_status_handler():
+    movie = select_movie_by_title("Enter movie title: ")
+    if not movie:
+        return
+    print(f"Selected movie: {movie[1]}")
+    status = get_valid_status("Enter new status (want_to_watch, watching, watched): ")
+    update_movie_status(movie[0], status)
+
 
