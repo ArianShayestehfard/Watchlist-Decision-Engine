@@ -54,4 +54,12 @@ def change_status_handler():
     status = get_valid_status("Enter new status (want_to_watch, watching, watched): ")
     update_movie_status(movie[0], status)
 
+def rate_movie_handler():
+    movie = select_movie_by_title("Enter movie title: ")
+    if not movie:
+        return
+    print(f"Selected movie: {movie[1]}")
+    rating = get_valid_rating("Enter your rating (0-10): ")
+    update_movie_rating(movie[0], rating)
+
 
