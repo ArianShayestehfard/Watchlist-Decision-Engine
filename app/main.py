@@ -1,7 +1,12 @@
-from movie_service import add_movie, update_movie_rating, update_movie_status, get_movies_by_status, get_movie_by_exact_title, get_movie_by_title, find_movies_by_title
-from recommendation import recommend_movie
-from analytics import watched_stats, top_rated
-from omdb_api import search_movie
+from handlers import (
+    search_movie_handler,
+    view_watchlist_handler,
+    add_movie_handler,
+    change_status_handler,
+    rate_movie_handler,
+    recommend_movie_handler,
+    view_statistics_handler
+)
 import sys
 
 def get_valid_status(prompt):
