@@ -1,14 +1,8 @@
-from movie_service import add_movies_batch, get_movies
+from analytics import watched_stats, top_rated
 
-result = add_movies_batch([
-    "Interstellar",
-    "Inception",
-    "The Matrix",
-    "Parasite"
-])
+stats = watched_stats()
+print(f"Watched: {stats['count']} movies, average rating: {stats['average_rating']}")
 
-print(f"Added: {result['added']}")
-print(f"Failed: {result['failed']}")
-
-for movie in get_movies():
+print("--- Top rated in your list ---")
+for movie in top_rated(limit=3):
     print(movie)
