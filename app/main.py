@@ -1,3 +1,9 @@
+from movie_service import add_movie, update_movie_rating, update_movie_status, get_movies_by_status
+from recommendation import recommend_movie
+from analytics import watched_stats, top_rated
+from omdb_api import search_movie
+import sys
+
 print("""
 🎬 AI MOVIE RECOMMENDATION SYSTEM            
                                           
