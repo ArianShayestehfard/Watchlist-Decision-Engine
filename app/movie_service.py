@@ -20,6 +20,14 @@ def add_movie(imdb_id, title, release_date, runtime, rating, overview):
         VALUES (?, ?, ?, ?, ?, ?)
                    """, (imdb_id, title, release_date, runtime, rating, overview))
     connection.commit()
+
+    if imdb_id:
+        cursor.execute("SELECT id FROM movies WHERE imdb_id = ?", (imdb_id,))
+        row = cursor.fetchone()
+        if row:
+            movie_id = row[0]
+            _fetch_and_save_genres(movie_id, imdb_id)
+
     connection.close()
     print("Movie added successfully!")
 
