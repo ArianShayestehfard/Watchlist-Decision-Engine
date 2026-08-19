@@ -23,6 +23,48 @@ def add_movie(imdb_id, title, release_date, runtime, rating, overview):
     connection.close()
     print("Movie added successfully!")
 
+def _fetch_and_save_genres(movie_id, imdb_id):
+    load_dotenv()
+    API_KEY = os.getenv("OMDB_API_KEY")
+    BASE_URL = "http://www.omdbapi.com/"
+    params = {"apikey": API_KEY, "i": imdb_id}
+    try:
+        response = requests.get(BASE_URL, params=params, timeout=10)
+        if response.status_code == 200:
+            data = response.json()
+            if data.get("Genre"):
+                genres = [g.strip() for g in data["Genre"].split(",")]
+                for genre in genres:
+                    add_genre_to_movie(movie_id, genre)
+    except:
+        pass
+
+def add_genre(genre_name):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("INSERT OR IGNORE INTO genres (name) VALUES (?)", (genre_name,))
+    conn.commit()
+    conn.close()
+
+def get_genre_id(genre_name):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM genres WHERE name = ?", (genre_name,))
+    result = cursor.fetchone()
+    conn.close()
+    return result[0] if result else None
+
+def add_genre_to_movie(movie_id, genre_name):
+    add_genre(genre_name)
+    genre_id = get_genre_id(genre_name)
+    if not genre_id:
+        return
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("INSERT OR IGNORE INTO movie_genres (movie_id, genre_id) VALUES (?, ?)", (movie_id, genre_id))
+    conn.commit()
+    conn.close()
+
 def get_movies():
     connection = get_connection()
     cursor = connection.cursor()
