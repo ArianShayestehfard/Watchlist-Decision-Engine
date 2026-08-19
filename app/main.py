@@ -7,6 +7,7 @@ from handlers import (
     recommend_movie_handler,
     view_statistics_handler
 )
+from database import create_tables
 import sys
 
 def main():
