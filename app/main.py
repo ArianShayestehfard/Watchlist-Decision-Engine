@@ -1,8 +1,8 @@
-from analytics import watched_stats, top_rated
+from recommendation import recommend_movie, recommend_top_n
 
-stats = watched_stats()
-print(f"Watched: {stats['count']} movies, average rating: {stats['average_rating']}")
+best = recommend_movie()
+print(f"Recommended: {best}")
 
-print("--- Top rated in your list ---")
-for movie in top_rated(limit=3):
+print("--- Top 3 recommendations ---")
+for movie in recommend_top_n(3):
     print(movie)
