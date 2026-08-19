@@ -8,3 +8,13 @@ def get_valid_status(prompt):
             return status
         print(f"Invalid status. Choose from {VALID_STATUSES}.")
 
+def get_valid_rating(prompt):
+    while True:
+        try:
+            rating = float(input(prompt))
+            if 0 <= rating <= 10:
+                return rating
+            print("Rating must be between 0 and 10.")
+        except ValueError:
+            print("Invalid input. Enter a number.")
+
