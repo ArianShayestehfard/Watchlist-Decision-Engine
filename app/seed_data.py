@@ -8,4 +8,4 @@ if __name__ == "__main__":
     print("Seeding database with movies")
     import_500_movies(delay=0.5)
 
-    print("✅ Database is ready!")
+    print("Database has been seeded")

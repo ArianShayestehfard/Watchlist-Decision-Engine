@@ -1,5 +1,6 @@
 import sqlite3
 import os
+from omdb_api import search_movie
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATABASE_DIR = os.path.join(BASE_DIR, "database")
