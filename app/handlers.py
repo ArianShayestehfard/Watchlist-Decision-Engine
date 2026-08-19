@@ -62,4 +62,11 @@ def rate_movie_handler():
     rating = get_valid_rating("Enter your rating (0-10): ")
     update_movie_rating(movie[0], rating)
 
+def recommend_movie_handler():
+    rec = recommend_movie()
+    if rec:
+        print(f"Recommended: {rec[2]} (IMDB rating: {rec[5]})")
+    else:
+        print("No rated movies in your watchlist.")
+
 
