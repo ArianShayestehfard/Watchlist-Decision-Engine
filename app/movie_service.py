@@ -17,7 +17,7 @@ def add_movie(imdb_id, title, release_date, runtime, rating, overview):
     cursor = connection.cursor()
     cursor.execute("""
                    INSERT OR IGNORE INTO movies (imdb_id, title, release_date, runtime, rating, overview)
-                   VALUES (?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?)
                    """, (imdb_id, title, release_date, runtime, rating, overview))
     connection.commit()
     connection.close()
