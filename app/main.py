@@ -13,3 +13,4 @@ print("""
 Choose an option please                   
 """)
 
+choice = int(input("Choose an option: "))
