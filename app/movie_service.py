@@ -115,7 +115,6 @@ def get_movie_by_title(title):
     return movie
 
 def add_movies_batch(titles):
-    from omdb_api import search_movie
     added = []
     failed = []
     for title in titles:
