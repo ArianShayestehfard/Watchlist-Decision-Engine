@@ -3,6 +3,8 @@ import os
 import time
 import requests
 from omdb_api import search_movie
+from movie_list import POPULAR_MOVIES
+from dotenv import load_dotenv
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATABASE_DIR = os.path.join(BASE_DIR, "database")
