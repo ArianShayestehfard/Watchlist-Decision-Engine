@@ -18,6 +18,8 @@ def exit_program():
     sys.exit(0)
 
 def main():
+    create_tables()
+
     menu_actions = {
         1: search_movie_handler,
         2: view_watchlist_handler,
