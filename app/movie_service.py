@@ -187,16 +187,6 @@ def get_movie_by_exact_title(title):
     connection.close()
     return movie
 
-def find_movies_by_title(title):
-    connection = get_connection()
-    cursor = connection.cursor()
-    cursor.execute("SELECT id, title, imdb_id FROM movies WHERE LOWER(title) LIKE ?", (f"%{title.lower()}%",))
-    movies = cursor.fetchall()
-    connection.close()
-    return movies
-from movie_list import POPULAR_MOVIES
-import time
-
 def import_500_movies(delay=0.5):
     added = 0
     failed = 0
