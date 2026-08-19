@@ -16,4 +16,15 @@ def get_genre_id(genre_name):
     conn.close()
     return result[0] if result else None
 
+def add_genre_to_movie(movie_id, genre_name):
+    add_genre(genre_name)
+    genre_id = get_genre_id(genre_name)
+    if not genre_id:
+        return
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("INSERT OR IGNORE INTO movie_genres (movie_id, genre_id) VALUES (?, ?)", (movie_id, genre_id))
+    conn.commit()
+    conn.close()
+
 
