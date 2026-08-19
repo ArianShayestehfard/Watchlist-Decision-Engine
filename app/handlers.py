@@ -65,7 +65,8 @@ def rate_movie_handler():
 def recommend_movie_handler():
     rec = recommend_movie()
     if rec:
-        print(f"Recommended: {rec[2]} (IMDB rating: {rec[5]})")
+        movie_id, title, score = rec
+        print(f"AI Recommendation: {title} (Relevance Score: {score:.2f})")
     else:
         print("No rated movies in your watchlist.")
 
