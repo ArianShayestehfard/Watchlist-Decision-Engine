@@ -219,3 +219,12 @@ def get_movies_by_status(status):
     connection.close()
 
     return movies
+
+
+def get_movie_by_id(movie_id):
+    connection = get_connection()
+    cursor = connection.cursor()
+    cursor.execute("SELECT id, title FROM movies WHERE id = ?", (movie_id,))
+    movie = cursor.fetchone()
+    connection.close()
+    return movie
