@@ -11,8 +11,6 @@ def get_connection():
     os.makedirs(DATABASE_DIR, exist_ok=True)
 
     connection = sqlite3.connect(DATABASE_NAME)
-
-    # فعال کردن Foreign Key ها در SQLite
     connection.execute("PRAGMA foreign_keys = ON")
 
     return connection
@@ -23,7 +21,6 @@ def create_tables():
     connection = get_connection()
     cursor = connection.cursor()
 
-    # Movies
     cursor.execute("""
                    CREATE TABLE IF NOT EXISTS movies (
                                                          id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -36,7 +33,6 @@ def create_tables():
                    )
                    """)
 
-    # Genres
     cursor.execute("""
                    CREATE TABLE IF NOT EXISTS genres (
                                                          id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -44,7 +40,6 @@ def create_tables():
                    )
                    """)
 
-    # Movie <-> Genre
     cursor.execute("""
                    CREATE TABLE IF NOT EXISTS movie_genres (
                                                                movie_id INTEGER,
@@ -62,7 +57,6 @@ def create_tables():
                        )
                    """)
 
-    # User ratings
     cursor.execute("""
                    CREATE TABLE IF NOT EXISTS ratings (
                                                           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -75,7 +69,6 @@ def create_tables():
                        )
                    """)
 
-    # Watchlist
     cursor.execute("""
                    CREATE TABLE IF NOT EXISTS watchlist (
                                                             id INTEGER PRIMARY KEY AUTOINCREMENT,
