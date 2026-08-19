@@ -213,7 +213,7 @@ def import_500_movies(delay=0.5):
             print(f"Added: {data.get('title')}")
         else:
             failed += 1
-            print(f"❌ Failed: {title}")
+            print(f"Failed: {title}")
 
         time.sleep(delay)
 
