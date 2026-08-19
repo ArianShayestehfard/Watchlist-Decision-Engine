@@ -162,7 +162,6 @@ def update_movie_status(movie_id, new_status):
     connection = get_connection()
     cursor = connection.cursor()
 
-    # اول بررسی کنیم فیلم وجود دارد
     cursor.execute("""
                    SELECT id
                    FROM watchlist
@@ -173,7 +172,6 @@ def update_movie_status(movie_id, new_status):
 
     if existing:
 
-        # فیلم از قبل در Watchlist است
         cursor.execute("""
                        UPDATE watchlist
                        SET status = ?
@@ -182,7 +180,6 @@ def update_movie_status(movie_id, new_status):
 
     else:
 
-        # فیلم هنوز وارد Watchlist نشده
         cursor.execute("""
                        INSERT INTO watchlist (movie_id, status)
                        VALUES (?, ?)
