@@ -10,10 +10,6 @@ from handlers import (
 from database import create_tables
 import sys
 
-def main():
-    from database import create_tables
-    create_tables()
-
 def exit_program():
     print("Goodbye!")
     sys.exit(0)
