@@ -68,8 +68,8 @@ def recommend_movie_handler():
         movie_id, title, score = rec
         print(f"AI Recommendation: {title} (Relevance Score: {score:.2f})")
     else:
-        print("No rated movies in your watchlist.")
-
+        print("No recommendations available. Rate some movies first!")
+        
 def view_statistics_handler():
     stats = watched_stats()
     print(f"Watched movies: {stats['count']}, Average rating: {stats['average_rating']}")
