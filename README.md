@@ -205,7 +205,6 @@ Create a `.env` file inside `app/` based on `.env.example`:
 OMDB_API_KEY=your_actual_key_here
 ```
 
-> ⚠️ Never commit your real API key to GitHub.
 
 ### Run
 
