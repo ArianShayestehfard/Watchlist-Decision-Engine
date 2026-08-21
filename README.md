@@ -57,27 +57,6 @@ The application runs as an interactive command-line system:
 8- 🚪 Exit
 ```
 
-A typical workflow is:
-
-```text
-Search Movie
-     │
-     ▼
-Add to Watchlist
-     │
-     ▼
-Watch / Rate Movies
-     │
-     ▼
-Build Personal Preference Signal
-     │
-     ▼
-Recommendation Engine
-     │
-     ▼
-🎯 Recommended Movies
-```
-
 ---
 
 ## ✨ Features
@@ -93,367 +72,134 @@ Search for movies by title through the **OMDb API** and retrieve information suc
 * Plot overview
 * IMDb rating
 
----
-
 ### 📋 Watchlist Management
 
-Movies can be tracked using three states:
-
-```text
-want_to_watch
-watching
-watched
-```
-
-This allows the application to distinguish between planned, currently watched, and completed movies.
-
----
+Movies can be tracked using three states: `want_to_watch`, `watching`, `watched`. This allows the application to distinguish between planned, currently watched, and completed movies.
 
 ### ⭐ Personal Ratings
 
-The system stores the user's own rating separately from IMDb's public rating.
-
-```text
-IMDb Rating      → External movie rating
-Personal Rating  → User preference signal
-```
-
-Personal ratings are then used by the recommendation engine.
-
----
+The system stores the user's own rating separately from IMDb's public rating. IMDb's rating is external reference data; the personal rating is the actual preference signal the recommendation engine learns from.
 
 ### 🎯 Personalized Recommendations
 
-The system uses a **content-based filtering approach** based on:
-
-* Movie genres
-* Plot descriptions
-* Personal ratings
-
-The recommendation pipeline is:
-
-```text
-Movie Metadata
-      │
-      ▼
-Genres + Plot
-      │
-      ▼
-TF-IDF Vectorization
-      │
-      ▼
-Cosine Similarity
-      │
-      ▼
-Personal Rating Weight
-      │
-      ▼
-Candidate Filtering
-      │
-      ▼
-Ranked Recommendations
-```
-
----
+The system uses a **content-based filtering approach** based on movie genres, plot descriptions, and personal ratings.
 
 ### 📊 Watchlist Analytics
 
-The application provides statistics including:
-
-* Average rating of watched movies
-* Top-rated movies
-* Watchlist information
-
----
+The application provides statistics including average rating of watched movies and top-rated movies in the list.
 
 ### 🌱 Batch Movie Import
 
 A curated list of popular movies can be imported into the database to quickly create a useful dataset for testing and experimentation.
 
----
-
 ### 🛡️ Input Validation & Error Handling
 
-The application includes validation and error handling for situations such as:
-
-* Invalid user input
-* Invalid ratings
-* Invalid watchlist status
-* Missing movie information
-* API/network failures
-* Missing configuration
+The application validates user input (status, rating, movie selection) and handles OMDb network failures, timeouts, and missing configuration without crashing.
 
 ---
 
-# 🤖 Recommendation Engine
-
-## How does it work?
+## 🤖 Recommendation Engine
 
 The recommendation engine uses **TF-IDF** and **cosine similarity** to compare movies based on their textual characteristics.
-
-### 1. Feature Construction
-
-For each movie, genres and plot information are combined into a textual representation.
 
 ```text
 Genres + Plot Overview
           │
           ▼
-     Movie Features
-```
-
-### 2. TF-IDF
-
-`TfidfVectorizer` converts the movie text into numerical vectors.
-
-```text
-Movie Text
-    │
-    ▼
-TF-IDF Vectorization
-    │
-    ▼
-Numerical Feature Vectors
-```
-
-### 3. Similarity
-
-`cosine_similarity` calculates how similar movies are to one another.
-
-```text
-Movie A ───────────── Movie B
+   TF-IDF Vectorization
           │
           ▼
-   Cosine Similarity
+    Cosine Similarity
+          │
+          ▼
+  Weighted by Personal Rating
+          │
+          ▼
+Filter out rated / watched movies
+          │
+          ▼
+   🎯 Ranked Recommendations
 ```
 
-### 4. Personalization
+1. Each movie's genres and plot are combined into a single text feature.
+2. `TfidfVectorizer` converts that text into numerical vectors; `cosine_similarity` compares every movie against every other movie.
+3. For each movie the user personally rated, similar movies are found and weighted by how highly the user rated the original.
+4. Movies already rated or marked `watched` are excluded from the results.
+5. The remaining candidates are ranked by accumulated score.
 
-The similarity scores are influenced by the user's own movie ratings.
-
-Conceptually:
-
-```text
-Similarity × Personal Rating
-            │
-            ▼
- Recommendation Contribution
-```
-
-Highly-rated movies therefore have a stronger influence on the final ranking.
-
-### 5. Filtering
-
-Movies that have already been rated or marked as watched are excluded from the recommendation candidates.
-
-### 6. Ranking
-
-The remaining candidates are ranked by their accumulated recommendation score.
-
-```text
-              Candidate Movies
-                      │
-                      ▼
-              Similarity Scores
-                      │
-                      ▼
-              Rating Influence
-                      │
-                      ▼
-                  Filtering
-                      │
-                      ▼
-                   Ranking
-                      │
-                      ▼
-             🎯 Top Recommendations
-```
-
-This makes the current system a **content-based recommendation system**, rather than a collaborative filtering system.
+This makes it a **content-based recommendation system**, not collaborative filtering — recommendations only start appearing once you've rated at least one movie.
 
 ---
 
-# 🧠 Why a Decision Support System?
-
-A traditional watchlist application mainly performs CRUD operations:
+## 🏗️ Architecture
 
 ```text
-Create
-Read
-Update
-Delete
-```
+User / CLI
+    │
+    ▼
+main.py (menu loop)
+    │
+    ▼
+handlers.py
+    │
+    ├──▶ validators.py
+    ├──▶ movie_service.py ──▶ database.py ──▶ SQLite
+    └──▶ recommendation.py ──▶ recommender.py (TF-IDF + cosine similarity)
 
-This project adds a decision-making layer.
-
-```text
-              Movie Data
-                  │
-                  ▼
-          User Interaction
-                  │
-                  ▼
-          Personal Ratings
-                  │
-                  ▼
-        Similarity Analysis
-                  │
-                  ▼
-               Ranking
-                  │
-                  ▼
-          Recommendation
-                  │
-                  ▼
-          Decision Support
-```
-
-The goal is not only to **store information**, but to transform stored information into an actionable recommendation.
-
----
-
-# 🏗️ Architecture
-
-```text
-                         ┌─────────────────┐
-                         │    User / CLI   │
-                         └────────┬────────┘
-                                  │
-                                  ▼
-                         ┌─────────────────┐
-                         │     main.py     │
-                         │   CLI / Menu    │
-                         └────────┬────────┘
-                                  │
-                                  ▼
-                         ┌─────────────────┐
-                         │   handlers.py   │
-                         └────────┬────────┘
-                                  │
-              ┌───────────────────┼───────────────────┐
-              │                   │                   │
-              ▼                   ▼                   ▼
-       ┌────────────┐      ┌──────────────┐   ┌───────────────┐
-       │ validators │      │movie_service │   │recommendation │
-       └────────────┘      └───────┬──────┘   └───────┬───────┘
-                                   │                   │
-                                   ▼                   ▼
-                           ┌──────────────┐    ┌──────────────┐
-                           │  database.py │    │ recommender  │
-                           └───────┬──────┘    │ TF-IDF +     │
-                                   │           │ cosine       │
-                                   ▼           │ similarity   │
-                           ┌──────────────┐    └──────────────┘
-                           │    SQLite    │
-                           │   Database   │
-                           └──────────────┘
-
-                           ┌──────────────┐
-                           │   OMDb API   │
-                           └──────┬───────┘
-                                  │
-                                  ▼
-                           ┌──────────────┐
-                           │ omdb_api.py  │
-                           └──────────────┘
+omdb_api.py ──▶ OMDb API
 ```
 
 ---
 
-# 🗄️ Database Design
-
-The application uses SQLite with separate tables for movie metadata, genres, personal ratings, and watchlist state.
-
-```text
-                  ┌───────────────┐
-                  │    movies     │
-                  └───────┬───────┘
-                          │
-             ┌────────────┼────────────┐
-             │            │            │
-             ▼            ▼            ▼
-       ┌──────────┐ ┌───────────┐ ┌────────────┐
-       │ ratings  │ │ watchlist │ │movie_genres│
-       └──────────┘ └───────────┘ └──────┬─────┘
-                                         │
-                                         ▼
-                                   ┌───────────┐
-                                   │  genres   │
-                                   └───────────┘
-```
-
-### Main tables
+## 🗄️ Database Design
 
 | Table          | Purpose                                 |
-| -------------- | --------------------------------------- |
-| `movies`       | Core movie metadata                     |
-| `genres`       | Normalized genre information            |
+| -------------- | ---------------------------------------- |
+| `movies`       | Core movie metadata cached from OMDb     |
+| `genres`       | Normalized genre lookup table            |
 | `movie_genres` | Movie ↔ genre many-to-many relationship |
-| `ratings`      | User's personal ratings                 |
-| `watchlist`    | Movie watch status                      |
+| `ratings`      | User's personal ratings                  |
+| `watchlist`    | Movie watch status                       |
 
 The user's personal rating is deliberately kept separate from IMDb's public rating.
 
 ---
 
-# 🛠️ Technology Stack
+## 🛠️ Technology Stack
 
 | Technology        | Purpose                        |
-| ----------------- | ------------------------------ |
+| ------------------ | ------------------------------- |
 | **Python 3.11+**  | Application and business logic |
-| **SQLite**        | Relational data storage        |
-| **OMDb API**      | Movie metadata                 |
-| **Pandas**        | Data processing                |
+| **SQLite**         | Relational data storage        |
+| **OMDb API**       | Movie metadata                 |
+| **Pandas**         | Data processing                |
 | **Scikit-learn**  | TF-IDF and cosine similarity   |
-| **Requests**      | HTTP communication             |
+| **Requests**       | HTTP communication             |
 | **python-dotenv** | Environment configuration      |
-| **Pytest**        | Automated testing              |
+| **Pytest**         | Automated testing               |
 
 ---
 
-# 🚀 Quick Start
+## 🚀 Quick Start
 
-## Prerequisites
+### Prerequisites
 
 * Python 3.11+
-* A free OMDb API key
+* A free OMDb API key from [omdbapi.com/apikey.aspx](https://www.omdbapi.com/apikey.aspx)
 
-Get an API key from:
-
-https://www.omdbapi.com/apikey.aspx
-
-## Clone the repository
+### Setup
 
 ```bash
 git clone https://github.com/ArianShayestehfard/Watchlist-Decision-Engine.git
 cd Watchlist-Decision-Engine
-```
 
-## Create a virtual environment
-
-### Windows
-
-```bash
 python -m venv .venv
-.venv\Scripts\activate
-```
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
 
-### macOS / Linux
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-```
-
-## Install dependencies
-
-```bash
 pip install -r requirements.txt
 ```
 
-## Configure OMDb
-
-Create a `.env` file based on `.env.example`:
+Create a `.env` file inside `app/` based on `.env.example`:
 
 ```env
 OMDB_API_KEY=your_actual_key_here
@@ -461,36 +207,34 @@ OMDB_API_KEY=your_actual_key_here
 
 > ⚠️ Never commit your real API key to GitHub.
 
-## Run the application
+### Run
 
 ```bash
 cd app
 python main.py
 ```
 
-The SQLite database is created automatically when required.
+The SQLite database is created automatically on first run.
+
+### (Optional) Seed the database
+
+```bash
+python seed_data.py
+```
 
 ---
 
-# 🧪 Testing
-
-Run the automated tests from the project root:
+## 🧪 Testing
 
 ```bash
 pytest tests/ -v
 ```
 
-The test suite covers important application behavior including:
-
-* OMDb response parsing
-* Runtime parsing
-* Release-date parsing
-* Analytics calculations
-* Recommendation-related regression cases
+The test suite covers OMDb response parsing (release date, runtime), analytics calculations, and a regression test for a real bug found during development (a `numpy.int64` type mismatch that silently broke database lookups in the recommender).
 
 ---
 
-# 📁 Project Structure
+## 📁 Project Structure
 
 ```text
 Watchlist-Decision-Engine/
@@ -515,16 +259,8 @@ Watchlist-Decision-Engine/
 │   ├── test_analytics.py
 │   └── test_recommender_types.py
 │
-├── database/
-│
-├── docs/
-│
-├── .github/
-│   └── workflows/
-│
 ├── .env.example
 ├── .gitignore
-├── CHANGELOG.md
 ├── LICENSE
 ├── README.md
 └── requirements.txt
@@ -532,60 +268,35 @@ Watchlist-Decision-Engine/
 
 ---
 
-# 📌 Current Limitations
+## 📌 Current Limitations
 
-The current implementation intentionally focuses on a lightweight, interpretable recommendation model.
-
-* Recommendations are based on genres and plot text.
-* Actors and directors are not currently used as recommendation features.
-* The system does not currently implement collaborative filtering.
-* At least one personal rating is needed to build a recommendation signal.
-* The application is currently designed around a local/single-user workflow.
-* OMDb API availability and request limits can affect movie retrieval.
+* Recommendations are based on genres and plot text only — actors and directors are not currently used as features.
+* No collaborative filtering; this is a single-user, content-based system.
+* At least one personal rating is needed before any recommendation can be generated.
+* Designed around a local, single-user workflow.
+* OMDb API availability and rate limits can affect movie retrieval.
 
 ---
 
-# 🗺️ Roadmap
+## 🗺️ Roadmap
 
-## Recommendation
+**Recommendation**
+- [ ] Recommendation explanations (why a movie was suggested)
+- [ ] Genre / runtime / release-year preference weighting
+- [ ] Collaborative filtering
 
-* [ ] Recommendation explanations
-* [ ] Genre preference weighting
-* [ ] Runtime preference
-* [ ] Release-year preference
-* [ ] Recommendation score breakdown
-* [ ] Semantic embeddings
-* [ ] Collaborative filtering
+**Engineering**
+- [ ] Expand automated test coverage
+- [ ] GitHub Actions CI
+- [ ] Database migrations
 
-## Engineering
-
-* [ ] Expand automated test coverage
-* [ ] GitHub Actions CI
-* [ ] Improve application architecture
-* [ ] Add database migrations
-* [ ] Improve error reporting
-
-## Product
-
-* [ ] FastAPI backend
-* [ ] PostgreSQL support
-* [ ] Web interface
-* [ ] Multi-user support
-* [ ] Docker deployment
+**Product**
+- [ ] Web interface (FastAPI backend)
+- [ ] Multi-user support
 
 ---
 
-# 📚 Documentation
-
-Technical documentation:
-
-* [Architecture](docs/architecture.md)
-* [Database Design](docs/database.md)
-* [Recommendation Engine](docs/recommendation.md)
-
----
-
-# 👨‍💻 Author
+## 👨‍💻 Author
 
 <p align="center">
   <b>Arian Shayestehfard</b>
@@ -599,11 +310,9 @@ Technical documentation:
 
 ---
 
-# 📄 License
+## 📄 License
 
-This project is licensed under the **MIT License**.
-
-See [LICENSE](LICENSE) for details.
+This project is licensed under the **MIT License**. See [LICENSE](LICENSE) for details.
 
 ---
 
